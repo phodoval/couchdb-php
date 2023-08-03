@@ -7,6 +7,13 @@ use Psr\Http\Message\ResponseInterface;
 class Client {
     protected  \GuzzleHttp\Client $client;
 
+    /**
+     * @param string               $host
+     * @param int                  $port
+     * @param string               $user
+     * @param string               $password
+     * @param array<string, mixed> $clientOptions
+     */
     public function __construct(
         private string $host,
         private int $port,
@@ -34,6 +41,9 @@ class Client {
     }
 
     /**
+     * @param string                    $path
+     * @param array<string, mixed>|null $data
+     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function put(string $path, array $data = null): ResponseInterface {
@@ -43,6 +53,9 @@ class Client {
     }
 
     /**
+     * @param string                    $path
+     * @param array<string, mixed>|null $data
+     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function post(string $path, array $data = null): ResponseInterface {
@@ -52,6 +65,9 @@ class Client {
     }
 
     /**
+     * @param string               $url
+     * @param array<string, mixed> $options
+     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function delete(string $url, array $options = []): ResponseInterface {

@@ -20,7 +20,7 @@ class DocumentTest extends TestCase {
         $this->assertNotNull($document);
         $this->assertEquals('myDocId', $document->getId());
         $this->assertEquals('1-967a00dff5e02add41819138abb3284d', $document->getRevision());
-        $this->assertEquals('John Doe', $document->getData('name'));
+        $this->assertEquals('John Doe', $document->get('name'));
     }
 
     public function testGetNotFound() {
@@ -41,7 +41,7 @@ class DocumentTest extends TestCase {
         $document = $database->createDocument('myNewDoc', ['name' => 'John Doe']);
         $this->assertEquals('myNewDoc', $document->getId());
         $this->assertEquals('1-967a00dff5e02add41819138abb3284d', $document->getRevision());
-        $this->assertEquals('John Doe', $document->getData('name'));
+        $this->assertEquals('John Doe', $document->get('name'));
     }
 
     public function testCreateFailure(): void {
@@ -61,12 +61,12 @@ class DocumentTest extends TestCase {
 
         $document = $database->getDocument('myDocId');
         $this->assertEquals('1-967a00dff5e02add41819138abb3284d', $document->getRevision());
-        $this->assertEquals('John Doe', $document->getData('name'));
+        $this->assertEquals('John Doe', $document->get('name'));
 
         $document->setData(['name' => 'Jane Doe']);
         $document = $database->updateDocument($document);
         $this->assertEquals('2-7051cbe5c8faecd085a3fa619e6e6337', $document->getRevision());
-        $this->assertEquals('Jane Doe', $document->getData('name'));
+        $this->assertEquals('Jane Doe', $document->get('name'));
     }
 
     public function testUpdateFailure(): void {
@@ -77,7 +77,7 @@ class DocumentTest extends TestCase {
 
         $document = $database->getDocument('myDocId');
         $this->assertEquals('1-967a00dff5e02add41819138abb3284d', $document->getRevision());
-        $this->assertEquals('John Doe', $document->getData('name'));
+        $this->assertEquals('John Doe', $document->get('name'));
 
         $document->setData(['name' => 'Jane Doe']);
 

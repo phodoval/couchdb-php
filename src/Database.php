@@ -1,6 +1,7 @@
 <?php
 namespace Phodoval\CouchDB;
 
+use CouchException;
 use GuzzleHttp\Exception\GuzzleException;
 
 class Database {
@@ -18,14 +19,25 @@ class Database {
     }
 
     /**
+     * @param string               $id
+     * @param array<string, mixed> $data
+     * @return Document
      * @throws GuzzleException
+     * @throws CouchException
      */
     public function createDocument(string $id, array $data): Document {
         $requestData = $data;
         $requestData['_id'] = $id;
 
         $response = $this->client->post('/' . $this->name, $requestData);
+        /**
+         * @var array<string, string> $newData
+         */
         $newData = json_decode($response->getBody()->getContents(), true);
+
+        if (!is_array($newData) || !isset($newData['ok'])) {
+            throw new CouchException('Failed to create document.');
+        }
 
         $rev = $newData['rev'];
         unset($newData['rev']);
@@ -35,8 +47,15 @@ class Database {
 
     public function getDocument(string $id): ?Document {
         try {
+            /**
+             * @var array<string, string> $data
+             */
             $data = json_decode($this->client->get('/' . $this->name . '/' . $id)->getBody(), true);
         } catch (GuzzleException) {
+            return null;
+        }
+
+        if (!is_array($data) || !isset($data['_rev'])) {
             return null;
         }
 
@@ -54,6 +73,9 @@ class Database {
         $data['_rev'] = $document->getRevision();
 
         $response = $this->client->put('/' . $this->name . '/' . $document->getId(), $data);
+        /**
+         * @var array<string, string> $newData
+         */
         $newData = json_decode($response->getBody()->getContents(), true);
 
         $rev = $newData['rev'];

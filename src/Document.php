@@ -2,6 +2,11 @@
 namespace Phodoval\CouchDB;
 
 class Document {
+    /**
+     * @param string               $id
+     * @param string|null          $rev
+     * @param array<string, mixed> $data
+     */
     public function __construct(
         private string $id,
         private ?string $rev = null,
@@ -16,14 +21,21 @@ class Document {
         return $this->rev;
     }
 
-    public function getData(string $key = null): mixed {
-        if ($key) {
-            return $this->data[$key] ?? null;
-        }
-
+    /**
+     * @return array<string, mixed>
+     */
+    public function getData(): array {
         return $this->data;
     }
 
+    public function get(string $key): mixed {
+        return $this->data[$key] ?? null;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return void
+     */
     public function setData(array $data): void {
         $this->data = array_merge($this->data, $data);
     }
