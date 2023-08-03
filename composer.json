@@ -1,0 +1,23 @@
+{
+    "name": "phodoval/couchdb-php",
+    "description": "CouchDB wrapper for PHP",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Phodoval\\CouchDB\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Pavel Hodoval"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "guzzlehttp/guzzle": "^6"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9",
+        "phpstan/phpstan": "^1.10"
+    }
+}
