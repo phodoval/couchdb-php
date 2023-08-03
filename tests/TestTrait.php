@@ -1,15 +1,23 @@
 <?php
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
 use Phodoval\CouchDB\Client;
 
 trait TestTrait {
-    protected Client $client;
+    public function getClient(array $responses): Client {
+        $mock = new MockHandler($responses);
 
-    public function setUp(): void {
-        $this->client = new Client(
-            'http://host.docker.internal',
-            5985,
-            'admin',
-            'admin'
+        $handlerStack = HandlerStack::create($mock);
+
+        return new Client(
+            host: 'http://hostname',
+            port: 5984,
+            user: 'user',
+            password: 'pass',
+            clientOptions: [
+                'timeout' => 2,
+                'handler' => $handlerStack,
+            ],
         );
     }
 }
