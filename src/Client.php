@@ -73,4 +73,11 @@ class Client {
     public function delete(string $url, array $options = []): ResponseInterface {
         return $this->client->request('DELETE', $url, $options);
     }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function head(string $path): ResponseInterface {
+        return $this->client->request('HEAD', $path);
+    }
 }

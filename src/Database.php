@@ -12,7 +12,7 @@ class Database {
 
     public function ping(): bool {
         try {
-            return $this->client->get('/' . $this->name)->getStatusCode() === 200;
+            return $this->client->head('/' . $this->name)->getStatusCode() === 200;
         } catch (GuzzleException) {
             return false;
         }
