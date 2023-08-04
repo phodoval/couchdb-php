@@ -133,4 +133,21 @@ class DocumentTest extends TestCase {
         $this->assertEquals('1-967a00dff5e02add41819138abb3284d', $documents[0]->getRevision());
         $this->assertEquals(['name' => 'John Doe'], $documents[0]->getData());
     }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function updateDocumentsSuccess(): void {
+        $database = $this->getClient([
+            new Response(200, [], '{"docs":[{"_id":"myDocId","_rev":"1-967a00dff5e02add41819138abb3284d","name":"John Doe"},{"_id":"myDocId2","_rev":"1-967a00dff5e02add41819138abb3284d","name":"Jane Doe"}]}'),
+            new Response(200, [], '[{"ok":true,"id":"myDocId","rev":"2-7051cbe5c8faecd085a3fa619e6e6337"},{"ok":true,"id":"myDocId2","rev":"2-5c8faecd085a3fa619e6e6337"}]'),
+        ])->database('test');
+
+        $documents = $database->findDocuments([]);
+        $this->assertCount(2, $documents);
+
+        $database->updateDocuments($documents);
+        $this->assertEquals('2-7051cbe5c8faecd085a3fa619e6e6337', $documents[0]->getRevision());
+        $this->assertEquals('2-5c8faecd085a3fa619e6e6337', $documents[1]->getRevision());
+    }
 }

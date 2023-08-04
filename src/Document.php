@@ -43,4 +43,14 @@ class Document {
     public function setData(array $data): void {
         $this->data = array_merge($this->data, $data);
     }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toArray(): array {
+        return [
+            '_id' => $this->id,
+            '_rev' => $this->rev,
+        ] + $this->data;
+    }
 }

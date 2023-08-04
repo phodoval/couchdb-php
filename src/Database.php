@@ -77,6 +77,29 @@ class Database {
         $document->setRevision($responseData['rev']);
     }
 
+    /**
+     * @param Document[] $documents
+     * @throws GuzzleException
+     */
+    public function updateDocuments(array $documents): void {
+        $requestData = [
+            'docs' => array_map(fn (Document $document) => $document->toArray(), $documents),
+        ];
+
+        $response = $this->client->post('/' . $this->name . '/_bulk_docs', $requestData);
+
+        /**
+         * @var array<array{id: string, rev: string, ok: bool}> $responseData
+         */
+        $responseData = json_decode($response->getBody()->getContents(), true);
+
+        foreach ($responseData as $index => $document) {
+            if ($document['ok']) {
+                $documents[$index]->setRevision($document['rev']);
+            }
+        }
+    }
+
     public function deleteDocument(Document $document): bool {
         try {
             $this->client->delete('/' . $this->name . '/' . $document->getId(), [
