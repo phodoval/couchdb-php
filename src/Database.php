@@ -31,18 +31,15 @@ class Database {
 
         $response = $this->client->post('/' . $this->name, $requestData);
         /**
-         * @var array<string, string> $newData
+         * @var array<string, string> $responseData
          */
-        $newData = json_decode($response->getBody()->getContents(), true);
+        $responseData = json_decode($response->getBody()->getContents(), true);
 
-        if (!is_array($newData) || !isset($newData['ok'])) {
+        if (!is_array($responseData) || !isset($responseData['ok'])) {
             throw new CouchException('Failed to create document.');
         }
 
-        $rev = $newData['rev'];
-        unset($newData['rev']);
-
-        return new Document($id, $rev, $data);
+        return new Document($id, $responseData['rev'], $data);
     }
 
     public function getDocument(string $id): ?Document {
@@ -68,22 +65,16 @@ class Database {
     /**
      * @throws GuzzleException
      */
-    public function updateDocument(Document $document): Document {
-        $data = $document->getData();
-        $data['_rev'] = $document->getRevision();
+    public function updateDocument(Document $document): void {
+        $requestData = $document->getData();
+        $requestData['_rev'] = $document->getRevision();
 
-        $response = $this->client->put('/' . $this->name . '/' . $document->getId(), $data);
+        $response = $this->client->put('/' . $this->name . '/' . $document->getId(), $requestData);
         /**
-         * @var array<string, string> $newData
+         * @var array<string, string> $responseData
          */
-        $newData = json_decode($response->getBody()->getContents(), true);
-
-        $rev = $newData['rev'];
-        unset($newData['rev']);
-
-        unset($data['_rev']);
-
-        return new Document($document->getId(), $rev, $data);
+        $responseData = json_decode($response->getBody()->getContents(), true);
+        $document->setRevision($responseData['rev']);
     }
 
     public function deleteDocument(Document $document): bool {

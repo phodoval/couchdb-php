@@ -33,6 +33,10 @@ class DocumentTest extends TestCase {
         $this->assertNull($document);
     }
 
+    /**
+     * @throws CouchException
+     * @throws GuzzleException
+     */
     public function testCreateSuccessful() {
         $database = $this->getClient([
             new Response(200, [], '{"ok":true,"id":"myNewDoc","rev":"1-967a00dff5e02add41819138abb3284d"}'),
@@ -44,6 +48,9 @@ class DocumentTest extends TestCase {
         $this->assertEquals('John Doe', $document->get('name'));
     }
 
+    /**
+     * @throws CouchException
+     */
     public function testCreateFailure(): void {
         $database = $this->getClient([
             new Response(409, [], '{"error":"conflict","reason":"Document update conflict."}'),
@@ -53,6 +60,9 @@ class DocumentTest extends TestCase {
         $database->createDocument('myNewDoc', ['name' => 'John Doe']);
     }
 
+    /**
+     * @throws GuzzleException
+     */
     public function testUpdateSuccess(): void {
         $database = $this->getClient([
             new Response(200, [], '{"_id":"myDocId","_rev":"1-967a00dff5e02add41819138abb3284d","name":"John Doe"}'),
@@ -64,7 +74,7 @@ class DocumentTest extends TestCase {
         $this->assertEquals('John Doe', $document->get('name'));
 
         $document->setData(['name' => 'Jane Doe']);
-        $document = $database->updateDocument($document);
+        $database->updateDocument($document);
         $this->assertEquals('2-7051cbe5c8faecd085a3fa619e6e6337', $document->getRevision());
         $this->assertEquals('Jane Doe', $document->get('name'));
     }

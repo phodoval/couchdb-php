@@ -21,6 +21,10 @@ class Document {
         return $this->rev;
     }
 
+    public function setRevision(string $rev): void {
+        $this->rev = $rev;
+    }
+
     /**
      * @return array<string, mixed>
      */
