@@ -118,4 +118,19 @@ class DocumentTest extends TestCase {
 
         $this->assertFalse($result);
     }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function testFindDocumentsSuccess(): void {
+        $database = $this->getClient([
+            new Response(200, [], '{"docs":[{"_id":"myDocId","_rev":"1-967a00dff5e02add41819138abb3284d","name":"John Doe"}]}'),
+        ])->database('test');
+
+        $documents = $database->findDocuments(['selector' => ['name' => 'John Doe']]);
+        $this->assertCount(1, $documents);
+        $this->assertEquals('myDocId', $documents[0]->getId());
+        $this->assertEquals('1-967a00dff5e02add41819138abb3284d', $documents[0]->getRevision());
+        $this->assertEquals(['name' => 'John Doe'], $documents[0]->getData());
+    }
 }

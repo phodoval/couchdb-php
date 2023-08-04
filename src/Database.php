@@ -90,4 +90,27 @@ class Database {
 
         return true;
     }
+
+    /**
+     * @param array<string, mixed> $query
+     * @return Document[]
+     * @throws GuzzleException
+     */
+    public function findDocuments(array $query): array {
+        $response = $this->client->post('/' . $this->name . '/_find', $query);
+        /**
+         * @var array{docs: array<array{_id: string, _rev: string}>} $responseData
+         */
+        $responseData = json_decode($response->getBody()->getContents(), true);
+        $documents = [];
+
+        foreach ($responseData['docs'] as $document) {
+            $id = $document['_id'];
+            $rev = $document['_rev'];
+            unset($document['_id'], $document['_rev']);
+            $documents[] = new Document($id, $rev, $document);
+        }
+
+        return $documents;
+    }
 }
