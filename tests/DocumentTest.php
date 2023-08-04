@@ -137,7 +137,7 @@ class DocumentTest extends TestCase {
     /**
      * @throws GuzzleException
      */
-    public function updateDocumentsSuccess(): void {
+    public function testUpdateDocumentsSuccess(): void {
         $database = $this->getClient([
             new Response(200, [], '{"docs":[{"_id":"myDocId","_rev":"1-967a00dff5e02add41819138abb3284d","name":"John Doe"},{"_id":"myDocId2","_rev":"1-967a00dff5e02add41819138abb3284d","name":"Jane Doe"}]}'),
             new Response(200, [], '[{"ok":true,"id":"myDocId","rev":"2-7051cbe5c8faecd085a3fa619e6e6337"},{"ok":true,"id":"myDocId2","rev":"2-5c8faecd085a3fa619e6e6337"}]'),
@@ -146,8 +146,19 @@ class DocumentTest extends TestCase {
         $documents = $database->findDocuments([]);
         $this->assertCount(2, $documents);
 
-        $database->updateDocuments($documents);
+        $count = $database->updateDocuments($documents);
+        $this->assertEquals(2, $count);
         $this->assertEquals('2-7051cbe5c8faecd085a3fa619e6e6337', $documents[0]->getRevision());
         $this->assertEquals('2-5c8faecd085a3fa619e6e6337', $documents[1]->getRevision());
+    }
+
+    public function testDeleteDocumentsSuccess(): void {
+        $database = $this->getClient([
+            new Response(200, [], '{"docs":[{"_id":"myDocId","_rev":"1-967a00dff5e02add41819138abb3284d","name":"John Doe"},{"_id":"myDocId2","_rev":"1-967a00dff5e02add41819138abb3284d","name":"John Doe"}]}'),
+            new Response(200, [], '[{"ok":true,"id":"myDocId","rev":"2-7051cbe5c8faecd085a3fa619e6e6337","_deleted":true},{"ok":true,"id":"myDocId2","rev":"2-5c8faecd085a3fa619e6e6337","_deleted":true}]'),
+        ])->database('test');
+
+        $count = $database->deleteDocumentsByQuery(['selector' => ['name' => 'John Doe']]);
+        $this->assertEquals(2, $count);
     }
 }

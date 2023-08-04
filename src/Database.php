@@ -79,9 +79,10 @@ class Database {
 
     /**
      * @param Document[] $documents
+     * @return int Number of updated rows
      * @throws GuzzleException
      */
-    public function updateDocuments(array $documents): void {
+    public function updateDocuments(array $documents): int {
         $requestData = [
             'docs' => array_map(fn (Document $document) => $document->toArray(), $documents),
         ];
@@ -93,11 +94,15 @@ class Database {
          */
         $responseData = json_decode($response->getBody()->getContents(), true);
 
+        $affectedRows = 0;
         foreach ($responseData as $index => $document) {
             if ($document['ok']) {
                 $documents[$index]->setRevision($document['rev']);
+                $affectedRows++;
             }
         }
+
+        return $affectedRows;
     }
 
     public function deleteDocument(Document $document): bool {
@@ -112,6 +117,28 @@ class Database {
         }
 
         return true;
+    }
+
+    /**
+     * @param Document[] $documents
+     * @return int Number of deleted rows
+     * @throws GuzzleException
+     */
+    public function deleteDocuments(array $documents): int {
+        foreach ($documents as $document) {
+            $document->setData(['_deleted' => true]);
+        }
+
+        return $this->updateDocuments($documents);
+    }
+
+    /**
+     * @param array<string, mixed> $query
+     * @throws GuzzleException
+     */
+    public function deleteDocumentsByQuery(array $query): int {
+        $documents = $this->findDocuments($query);
+        return $this->deleteDocuments($documents);
     }
 
     /**
