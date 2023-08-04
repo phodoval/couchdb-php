@@ -1,7 +1,6 @@
 <?php
 namespace Phodoval\CouchDB;
 
-use CouchException;
 use GuzzleHttp\Exception\GuzzleException;
 
 class Database {

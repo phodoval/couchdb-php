@@ -1,4 +1,6 @@
 <?php
-class CouchException extends Exception {
+namespace Phodoval\CouchDB;
 
-}
+use Exception;
+
+class CouchException extends Exception {}
